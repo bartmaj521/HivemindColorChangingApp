@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                             xmlns:tools="http://schemas.android.com/tools"
+                                             xmlns:app="http://schemas.android.com/apk/res-auto"
+                                             android:layout_width="match_parent"
+                                             android:layout_height="match_parent"
+                                             tools:context=".ControlFragment" android:id="@+id/frameLayout">
+
+    <Button
+            android:text="Start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/btn_start"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/ib_green"
+            app:layout_constraintStart_toStartOf="parent" android:visibility="visible"
+            tools:layout_conversion_absoluteHeight="1dp"
+            tools:layout_conversion_absoluteWidth="1dp"/>
+    <ImageButton
+            android:layout_width="150dp"
+            android:layout_height="150dp" app:srcCompat="@color/green"
+            android:id="@+id/ib_green"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:padding="0dp"
+            app:layout_constraintHorizontal_bias="0.16"
+            app:layout_constraintBottom_toTopOf="@+id/ib_blue" android:visibility="visible"
+            tools:layout_conversion_absoluteHeight="1dp"
+            tools:layout_conversion_absoluteWidth="1dp" android:layout_marginBottom="8dp"/>
+    <ImageButton
+            android:layout_width="150dp"
+            android:layout_height="150dp" app:srcCompat="@color/red"
+            android:id="@+id/ib_red"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:padding="0dp"
+            app:layout_constraintHorizontal_bias="0.84"
+            app:layout_constraintBottom_toTopOf="@+id/ib_magenta" android:visibility="visible"
+            tools:layout_conversion_absoluteHeight="1dp"
+            tools:layout_conversion_absoluteWidth="1dp" android:layout_marginBottom="8dp"/>
+    <ImageButton
+            android:layout_width="150dp"
+            android:layout_height="150dp" app:srcCompat="@color/blue"
+            android:id="@+id/ib_blue"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:padding="0dp"
+            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintHorizontal_bias="0.16"
+            android:visibility="visible" tools:layout_conversion_absoluteHeight="1dp"
+            tools:layout_conversion_absoluteWidth="1dp" android:layout_marginBottom="8dp"/>
+    <ImageButton
+            android:layout_width="150dp"
+            android:layout_height="150dp" app:srcCompat="@color/magenta"
+            android:id="@+id/ib_magenta"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:padding="0dp"
+            app:layout_constraintHorizontal_bias="0.84" android:visibility="visible"
+            tools:layout_conversion_absoluteHeight="1dp"
+            tools:layout_conversion_absoluteWidth="1dp" android:layout_marginBottom="8dp"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_avg_reaction"
+            app:layout_constraintBottom_toTopOf="@id/btn_start"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:visibility="visible" tools:layout_conversion_absoluteHeight="1dp"
+            tools:layout_conversion_absoluteWidth="1dp"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_points"
+            app:layout_constraintBottom_toTopOf="@id/tv_avg_reaction"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:visibility="visible" tools:layout_conversion_absoluteHeight="1dp"
+            tools:layout_conversion_absoluteWidth="1dp"/>
+
+</android.support.constraint.ConstraintLayout>
