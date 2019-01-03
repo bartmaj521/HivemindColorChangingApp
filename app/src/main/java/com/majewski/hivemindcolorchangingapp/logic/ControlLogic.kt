@@ -1,4 +1,4 @@
-package com.majewski.hivemindcolorchangingapp
+package com.majewski.hivemindcolorchangingapp.logic
 
 import android.content.Context
 import android.os.SystemClock
@@ -42,7 +42,7 @@ class ControlLogic(private val colorButtonClicks: PublishSubject<Byte>) {
 
         Observable.range(0, 10)
             .flatMap {
-                delay += Random.nextLong(2000,5000)
+                delay += Random.nextLong(2000, 5000)
                 Observable.just(it).delay(delay, TimeUnit.MILLISECONDS)
             }.subscribeOn(Schedulers.computation())
             .subscribe {
@@ -55,7 +55,7 @@ class ControlLogic(private val colorButtonClicks: PublishSubject<Byte>) {
         colorButtonClicks
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
-                if(it != lastColor) {
+                if (it != lastColor) {
                     fulfilled = false
                     communicationBus.onNext(Event(Event.Type.WRONG_BUTTON))
                 } else {
@@ -64,8 +64,18 @@ class ControlLogic(private val colorButtonClicks: PublishSubject<Byte>) {
                     if (fulfilled) {
                         points++
                         reactionTimes.add(newTime - lastShowTime)
-                        communicationBus.onNext(Event(Event.Type.NEW_AVERAGE, reactionTimes.average().toFloat()))
-                        communicationBus.onNext(Event(Event.Type.NEW_POINT, points))
+                        communicationBus.onNext(
+                            Event(
+                                Event.Type.NEW_AVERAGE,
+                                reactionTimes.average().toFloat()
+                            )
+                        )
+                        communicationBus.onNext(
+                            Event(
+                                Event.Type.NEW_POINT,
+                                points
+                            )
+                        )
                     }
                 }
             }.addTo(disposable)
@@ -77,11 +87,21 @@ class ControlLogic(private val colorButtonClicks: PublishSubject<Byte>) {
 
     private val serverCallbacks = object : ServerCallbacks {
         override fun onClientConnected(nbOfClients: Byte) {
-            communicationBus.onNext(Event(Event.Type.CLIENT_CONNECTED, nbOfClients))
+            communicationBus.onNext(
+                Event(
+                    Event.Type.CLIENT_CONNECTED,
+                    nbOfClients
+                )
+            )
         }
 
         override fun onClientDisconnected(clientId: Byte) {
-            communicationBus.onNext(Event(Event.Type.CLIENT_DISCONNECTED, clientId))
+            communicationBus.onNext(
+                Event(
+                    Event.Type.CLIENT_DISCONNECTED,
+                    clientId
+                )
+            )
         }
 
         override fun onDataChanged(data: ReceivedElement) {
@@ -92,15 +112,20 @@ class ControlLogic(private val colorButtonClicks: PublishSubject<Byte>) {
         }
 
         override fun onServerFailed(errorCode: Int) {
-            communicationBus.onNext(Event(Event.Type.SERVER_FAILED, errorCode))
+            communicationBus.onNext(
+                Event(
+                    Event.Type.SERVER_FAILED,
+                    errorCode
+                )
+            )
         }
     }
 
     class Event(
         val type: Type,
         val data: Any? = null
-    ){
-        enum class Type{
+    ) {
+        enum class Type {
             CLIENT_CONNECTED,
             CLIENT_DISCONNECTED,
             SERVER_STARTED,

@@ -1,28 +1,22 @@
-package com.majewski.hivemindcolorchangingapp
+package com.majewski.hivemindcolorchangingapp.fragment
 
 
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
-import android.os.SystemClock
 import android.support.v4.app.Fragment
 import android.support.v4.content.res.ResourcesCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import com.majewski.hivemindbt.data.ReceivedElement
-import com.majewski.hivemindbt.server.ServerCallbacks
-import io.reactivex.Observable
+import com.majewski.hivemindcolorchangingapp.ColorCodes
+import com.majewski.hivemindcolorchangingapp.R
+import com.majewski.hivemindcolorchangingapp.logic.ControlLogic
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.addTo
-import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.fragment_control.*
-import java.util.concurrent.TimeUnit
-import kotlin.random.Random
-import kotlin.random.nextInt
 
 class ControlFragment : Fragment() {
 
@@ -70,7 +64,7 @@ class ControlFragment : Fragment() {
     }
 
     private fun shuffleAndMapButtonsToActions() {
-        val array = ByteArray(4) {(it + 1).toByte()}.toMutableList()
+        val array = ByteArray(4) { (it + 1).toByte() }.toMutableList()
         array.shuffle()
 
         ib_1.setColorFilter(getColorByIntCode(array[0]))
@@ -96,33 +90,33 @@ class ControlFragment : Fragment() {
 
     private fun getColorByIntCode(colorCode: Byte): Int {
         return when (colorCode) {
-            RED -> {
-                    ResourcesCompat.getColor(
-                        resources,
-                        R.color.red,
-                        null
-                    )
+            ColorCodes.RED -> {
+                ResourcesCompat.getColor(
+                    resources,
+                    R.color.red,
+                    null
+                )
             }
-            GREEN -> {
-                    ResourcesCompat.getColor(
-                        resources,
-                        R.color.green,
-                        null
-                    )
+            ColorCodes.GREEN -> {
+                ResourcesCompat.getColor(
+                    resources,
+                    R.color.green,
+                    null
+                )
             }
-            BLUE -> {
-                    ResourcesCompat.getColor(
-                        resources,
-                        R.color.blue,
-                        null
-                    )
+            ColorCodes.BLUE -> {
+                ResourcesCompat.getColor(
+                    resources,
+                    R.color.blue,
+                    null
+                )
             }
-            MAGENTA -> {
-                    ResourcesCompat.getColor(
-                        resources,
-                        R.color.magenta,
-                        null
-                    )
+            ColorCodes.MAGENTA -> {
+                ResourcesCompat.getColor(
+                    resources,
+                    R.color.magenta,
+                    null
+                )
             }
             else -> {
                 Color.WHITE
@@ -139,21 +133,34 @@ class ControlFragment : Fragment() {
     }
 
     private fun onLogicEvent(event: ControlLogic.Event) {
-        when(event.type) {
-            ControlLogic.Event.Type.WRONG_BUTTON -> Toast.makeText(context, "Wrong button :(", Toast.LENGTH_SHORT).show()
-            ControlLogic.Event.Type.CLIENT_CONNECTED -> Toast.makeText(context, "Screen connected, nb of screens: ${event.data}", Toast.LENGTH_SHORT).show()
-            ControlLogic.Event.Type.CLIENT_DISCONNECTED -> Toast.makeText(context, "Screen ${event.data} disconnected", Toast.LENGTH_SHORT).show()
-            ControlLogic.Event.Type.SERVER_STARTED -> Toast.makeText(context, "Server started", Toast.LENGTH_SHORT).show()
-            ControlLogic.Event.Type.SERVER_FAILED -> Toast.makeText(context, "Server start failed", Toast.LENGTH_SHORT).show()
+        when (event.type) {
+            ControlLogic.Event.Type.WRONG_BUTTON -> Toast.makeText(
+                context,
+                "Wrong button :(",
+                Toast.LENGTH_SHORT
+            ).show()
+            ControlLogic.Event.Type.CLIENT_CONNECTED -> Toast.makeText(
+                context,
+                "Screen connected, nb of screens: ${event.data}",
+                Toast.LENGTH_SHORT
+            ).show()
+            ControlLogic.Event.Type.CLIENT_DISCONNECTED -> Toast.makeText(
+                context,
+                "Screen ${event.data} disconnected",
+                Toast.LENGTH_SHORT
+            ).show()
+            ControlLogic.Event.Type.SERVER_STARTED -> Toast.makeText(
+                context,
+                "Server started",
+                Toast.LENGTH_SHORT
+            ).show()
+            ControlLogic.Event.Type.SERVER_FAILED -> Toast.makeText(
+                context,
+                "Server start failed",
+                Toast.LENGTH_SHORT
+            ).show()
             ControlLogic.Event.Type.NEW_POINT -> setNbOfPoints(event.data as Int)
             ControlLogic.Event.Type.NEW_AVERAGE -> setAvgReactionTime(event.data as Float)
         }
-    }
-
-    companion object {
-        const val RED: Byte = 1
-        const val GREEN: Byte = 2
-        const val BLUE: Byte = 3
-        const val MAGENTA: Byte = 4
     }
 }

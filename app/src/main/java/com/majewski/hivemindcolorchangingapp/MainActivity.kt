@@ -5,6 +5,8 @@ import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
 import com.majewski.hivemindbt.HivemindBt
+import com.majewski.hivemindcolorchangingapp.fragment.ControlFragment
+import com.majewski.hivemindcolorchangingapp.fragment.RemoteScreenFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -14,7 +16,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         btn_control.setOnClickListener {
-            if(!HivemindBt.requestPermissions(this)){
+            if (!HivemindBt.requestPermissions(this)) {
                 Toast.makeText(this, "Need permissions", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
@@ -28,7 +30,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         btn_screen.setOnClickListener {
-            if(!HivemindBt.requestPermissions(this)){
+            if (!HivemindBt.requestPermissions(this)) {
                 Toast.makeText(this, "Need permissions", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
@@ -42,7 +44,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun changeFragment(f: Fragment){
+    private fun changeFragment(f: Fragment) {
         fl_fragment_container.removeAllViews()
         supportFragmentManager.beginTransaction()
             .add(R.id.fl_fragment_container, f).commit()
