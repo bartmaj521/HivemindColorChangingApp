@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun changeFragment(f: Fragment){
+    private fun changeFragment(f: Fragment){
         fl_fragment_container.removeAllViews()
         supportFragmentManager.beginTransaction()
             .add(R.id.fl_fragment_container, f).commit()

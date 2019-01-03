@@ -2,15 +2,16 @@ package com.majewski.hivemindcolorchangingapp
 
 
 import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
 import android.os.SystemClock
 import android.support.v4.app.Fragment
+import android.support.v4.content.res.ResourcesCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import com.majewski.hivemindbt.data.ReceivedElement
-import com.majewski.hivemindbt.server.HivemindBtServer
 import com.majewski.hivemindbt.server.ServerCallbacks
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -25,23 +26,22 @@ import kotlin.random.nextInt
 
 class ControlFragment : Fragment() {
 
-    private var server: HivemindBtServer? = null
     private val colorButtonClicks = PublishSubject.create<Byte>()
     private val disposable = CompositeDisposable()
 
-    var fulfilled = true
-    var points = 0
-    var lastShowTime: Long = 0
-    var lastColor = 0.toByte()
-    var reactionTimes = ArrayList<Long>()
+    private val logic = ControlLogic(colorButtonClicks)
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
 
         context?.let {
-            server = HivemindBtServer(context, serverCallbacks)
-            server?.addData("colorClient", 0)
-            server?.startServer()
+            logic.initializeBtServer(context)
+
+            logic.communicationBus
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    onLogicEvent(it)
+                }
         }
     }
 
@@ -56,69 +56,77 @@ class ControlFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         btn_start.setOnClickListener {
-
-            points = 0
-            reactionTimes.clear()
-
-            tv_avg_reaction.text = reactionTimes.average().toString()
-            tv_points.text = points.toString()
-
-            var delay = 0L
-
-            Observable.range(0, 10)
-                .flatMap {
-                    delay += Random.nextLong(2000,5000)
-                    Observable.just(it).delay(delay, TimeUnit.MILLISECONDS)
-                }.subscribeOn(Schedulers.computation())
-                .subscribe {
-                    lastColor= Random.nextInt(1..4).toByte()
-                    server?.sendData(byteArrayOf(Random.nextInt(1..2).toByte(), lastColor), "colorClient")
-                    lastShowTime = SystemClock.elapsedRealtime()
-                    fulfilled = true
-                }.addTo(disposable)
+            setAvgReactionTime(0f)
+            setNbOfPoints(0)
+            logic.startExercise()
         }
-
-        colorButtonClicks
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
-                if(it != lastColor) {
-                    fulfilled = false
-                    Toast.makeText(context, "Wrong button!!!", Toast.LENGTH_SHORT).show()
-                } else {
-                    val newTime = SystemClock.elapsedRealtime()
-                    server?.sendData(byteArrayOf(0.toByte()), "colorClient")
-                    if (fulfilled) {
-                        points++
-                        reactionTimes.add(newTime - lastShowTime)
-                        setAvgReactionTime(reactionTimes.average().toFloat())
-                        setNbOfPoints(points)
-                    }
-                }
-            }.addTo(disposable)
-
-        mapButtonsToSubject()
+        shuffleAndMapButtonsToActions()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         disposable.dispose()
+        logic.onDestroy()
     }
 
-    private fun mapButtonsToSubject() {
-        ib_red.setOnClickListener {
-            colorButtonClicks.onNext(RED)
+    private fun shuffleAndMapButtonsToActions() {
+        val array = ByteArray(4) {(it + 1).toByte()}.toMutableList()
+        array.shuffle()
+
+        ib_1.setColorFilter(getColorByIntCode(array[0]))
+        ib_1.setOnClickListener {
+            colorButtonClicks.onNext(array[0])
         }
 
-        ib_green.setOnClickListener {
-            colorButtonClicks.onNext(GREEN)
+        ib_2.setColorFilter(getColorByIntCode(array[1]))
+        ib_2.setOnClickListener {
+            colorButtonClicks.onNext(array[1])
         }
 
-        ib_blue.setOnClickListener {
-            colorButtonClicks.onNext(BLUE)
+        ib_3.setColorFilter(getColorByIntCode(array[2]))
+        ib_3.setOnClickListener {
+            colorButtonClicks.onNext(array[2])
         }
 
-        ib_magenta.setOnClickListener {
-            colorButtonClicks.onNext(MAGENTA)
+        ib_4.setColorFilter(getColorByIntCode(array[3]))
+        ib_4.setOnClickListener {
+            colorButtonClicks.onNext(array[3])
+        }
+    }
+
+    private fun getColorByIntCode(colorCode: Byte): Int {
+        return when (colorCode) {
+            RED -> {
+                    ResourcesCompat.getColor(
+                        resources,
+                        R.color.red,
+                        null
+                    )
+            }
+            GREEN -> {
+                    ResourcesCompat.getColor(
+                        resources,
+                        R.color.green,
+                        null
+                    )
+            }
+            BLUE -> {
+                    ResourcesCompat.getColor(
+                        resources,
+                        R.color.blue,
+                        null
+                    )
+            }
+            MAGENTA -> {
+                    ResourcesCompat.getColor(
+                        resources,
+                        R.color.magenta,
+                        null
+                    )
+            }
+            else -> {
+                Color.WHITE
+            }
         }
     }
 
@@ -130,27 +138,15 @@ class ControlFragment : Fragment() {
         tv_avg_reaction.text = resources.getString(R.string.average_reaction, avg)
     }
 
-    private val serverCallbacks = object : ServerCallbacks {
-        override fun onClientConnected(nbOfClients: Byte) {
-            activity?.runOnUiThread {
-                Toast.makeText(context, "Screen connected, nb of screens: $nbOfClients", Toast.LENGTH_SHORT)
-                    .show()
-            }
-        }
-
-        override fun onClientDisconnected(clientId: Byte) {
-            activity?.runOnUiThread {
-                Toast.makeText(context, "Screen $clientId disconnected", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        override fun onDataChanged(data: ReceivedElement) {
-        }
-
-        override fun onServerStarted() {
-        }
-
-        override fun onServerFailed(errorCode: Int) {
+    private fun onLogicEvent(event: ControlLogic.Event) {
+        when(event.type) {
+            ControlLogic.Event.Type.WRONG_BUTTON -> Toast.makeText(context, "Wrong button :(", Toast.LENGTH_SHORT).show()
+            ControlLogic.Event.Type.CLIENT_CONNECTED -> Toast.makeText(context, "Screen connected, nb of screens: ${event.data}", Toast.LENGTH_SHORT).show()
+            ControlLogic.Event.Type.CLIENT_DISCONNECTED -> Toast.makeText(context, "Screen ${event.data} disconnected", Toast.LENGTH_SHORT).show()
+            ControlLogic.Event.Type.SERVER_STARTED -> Toast.makeText(context, "Server started", Toast.LENGTH_SHORT).show()
+            ControlLogic.Event.Type.SERVER_FAILED -> Toast.makeText(context, "Server start failed", Toast.LENGTH_SHORT).show()
+            ControlLogic.Event.Type.NEW_POINT -> setNbOfPoints(event.data as Int)
+            ControlLogic.Event.Type.NEW_AVERAGE -> setAvgReactionTime(event.data as Float)
         }
     }
 

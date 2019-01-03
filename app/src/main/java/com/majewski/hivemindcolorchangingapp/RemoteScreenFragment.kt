@@ -84,7 +84,7 @@ class RemoteScreenFragment : Fragment() {
                                     )
                                 }
                                 BLUE -> {
-                                    Toast.makeText(this@RemoteScreenFragment.context, "BLUE", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "BLUE", Toast.LENGTH_SHORT).show()
                                     iv_color_display.setColorFilter(
                                         ResourcesCompat.getColor(
                                             resources,
@@ -104,8 +104,7 @@ class RemoteScreenFragment : Fragment() {
                                     )
                                 }
                             }
-                        }
-                        if (data.data[0] == 0.toByte()) {
+                        } else {
                             iv_color_display.setColorFilter(
                                 ResourcesCompat.getColor(
                                     resources,
@@ -119,6 +118,7 @@ class RemoteScreenFragment : Fragment() {
             }
         }
     }
+
     companion object {
         const val RED: Byte = 1
         const val GREEN: Byte = 2
