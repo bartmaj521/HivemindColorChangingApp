@@ -31,7 +31,8 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    implementation project(':hivemindbt')
+
+    implementation 'com.github.bartmaj521:HivemindBT:1.0.0'
 
     implementation "io.reactivex.rxjava2:rxjava:2.2.5"
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'

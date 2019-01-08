@@ -21,7 +21,6 @@ class RemoteScreenLogic {
     }
 
     private val clientCallbacks = object : ClientCallbacks {
-
         var clientId: Byte = 0
 
         override fun onServerFound(device: BluetoothDevice) {
@@ -35,6 +34,10 @@ class RemoteScreenLogic {
         }
 
         override fun onNumberOfClientsChanged(newNumberOfClients: Byte) {
+        }
+
+        override fun onDisconnectedFromServer(device: BluetoothDevice) {
+
         }
 
         override fun onDataChanged(data: ReceivedElement) {

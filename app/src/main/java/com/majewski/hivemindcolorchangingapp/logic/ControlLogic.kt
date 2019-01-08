@@ -34,7 +34,7 @@ class ControlLogic(private val colorButtonClicks: PublishSubject<Byte>) {
     private var mMaxDelay = 10
 
     fun initializeBtServer(context: Context) {
-        server = HivemindBtServer(context, serverCallbacks)
+        server = HivemindBtServer(context, mMaxNbOfScreens, serverCallbacks)
         server?.addData("colorClient", 0)
         server?.startServer()
     }
