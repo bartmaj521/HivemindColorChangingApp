@@ -1,5 +1,6 @@
 package com.majewski.hivemindcolorchangingapp
 
+import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
@@ -7,9 +8,19 @@ import android.widget.Toast
 import com.majewski.hivemindbt.HivemindBt
 import com.majewski.hivemindcolorchangingapp.fragment.ControlFragment
 import com.majewski.hivemindcolorchangingapp.fragment.RemoteScreenFragment
+import com.majewski.hivemindcolorchangingapp.fragment.SettingsFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), SettingsFragment.OnFragmentInteractionListener {
+
+    override var nbOfFlashes: Int = 10
+
+    override var minDuration: Int = 2000
+
+    override var maxDuration: Int = 5000
+
+    override var maxNumberOfScreens: Int = 2
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +52,10 @@ class MainActivity : AppCompatActivity() {
             }
 
             changeFragment(RemoteScreenFragment())
+        }
+
+        btn_settings.setOnClickListener {
+            changeFragment(SettingsFragment())
         }
     }
 

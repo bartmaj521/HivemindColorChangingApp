@@ -25,12 +25,24 @@ class ControlFragment : Fragment() {
 
     private val logic = ControlLogic(colorButtonClicks)
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        val nbOfFlashes = arguments?.getInt(TAG_NB_FLASHES) ?: 10
+        val maxNbOfScreens = arguments?.getInt(TAG_MAX_NB_SCREENS) ?: 2
+        val minDelay = arguments?.getInt(TAG_MIN_DELAY) ?: 2000
+        val maxDelay = arguments?.getInt(TAG_MAX_DELAY) ?: 5000
+
+        logic.setParameters(nbOfFlashes, maxNbOfScreens, minDelay, maxDelay)
+        context?.let {
+            logic.initializeBtServer(it)
+        }
+    }
+
     override fun onAttach(context: Context?) {
         super.onAttach(context)
 
         context?.let {
-            logic.initializeBtServer(context)
-
             logic.communicationBus
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
@@ -161,6 +173,26 @@ class ControlFragment : Fragment() {
             ).show()
             ControlLogic.Event.Type.NEW_POINT -> setNbOfPoints(event.data as Int)
             ControlLogic.Event.Type.NEW_AVERAGE -> setAvgReactionTime(event.data as Float)
+        }
+    }
+
+    companion object {
+        private const val TAG_NB_FLASHES = "nbOfFlashes"
+        private const val TAG_MAX_NB_SCREENS = "maxNbOfScreens"
+        private const val TAG_MIN_DELAY = "minDelay"
+        private const val TAG_MAX_DELAY = "maxDelay"
+
+        fun create(nbOfFlashes: Int, maxNbOfScreens:Int, minDelay: Int, maxDelay: Int): ControlFragment {
+
+            val f = ControlFragment()
+            f.arguments = Bundle()
+            f.arguments?.apply {
+                putInt(TAG_NB_FLASHES, nbOfFlashes)
+                putInt(TAG_MAX_NB_SCREENS, maxNbOfScreens)
+                putInt(TAG_MIN_DELAY, minDelay)
+                putInt(TAG_MAX_DELAY, maxDelay)
+            }
+            return f
         }
     }
 }

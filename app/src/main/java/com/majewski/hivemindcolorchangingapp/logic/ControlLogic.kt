@@ -28,6 +28,11 @@ class ControlLogic(private val colorButtonClicks: PublishSubject<Byte>) {
     private var lastColor = 0.toByte()
     private var reactionTimes = ArrayList<Long>()
 
+    private var mNbOfFlashes = 10
+    private var mMaxNbOfScreens = 10
+    private var mMinDelay = 10
+    private var mMaxDelay = 10
+
     fun initializeBtServer(context: Context) {
         server = HivemindBtServer(context, serverCallbacks)
         server?.addData("colorClient", 0)
@@ -40,9 +45,9 @@ class ControlLogic(private val colorButtonClicks: PublishSubject<Byte>) {
 
         var delay = 0L
 
-        Observable.range(0, 10)
+        Observable.range(0, mNbOfFlashes)
             .flatMap {
-                delay += Random.nextLong(2000, 5000)
+                delay += Random.nextLong(mMinDelay.toLong(), mMaxDelay.toLong())
                 Observable.just(it).delay(delay, TimeUnit.MILLISECONDS)
             }.subscribeOn(Schedulers.computation())
             .subscribe {
@@ -83,6 +88,13 @@ class ControlLogic(private val colorButtonClicks: PublishSubject<Byte>) {
 
     fun onDestroy() {
         disposable.dispose()
+    }
+
+    fun setParameters(nbOfFlashes: Int, maxNbOfScreens: Int, minDelay: Int, maxDelay: Int) {
+        mNbOfFlashes = nbOfFlashes
+        mMaxNbOfScreens = maxNbOfScreens
+        mMaxDelay = maxDelay
+        mMinDelay = minDelay
     }
 
     private val serverCallbacks = object : ServerCallbacks {
